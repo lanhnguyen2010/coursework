@@ -1,56 +1,62 @@
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
-/**
- * ======================================================================================
- * Client.java
- * ======================================================================================
- * <p>
- * Definitions for class:
- * - Client
- * <p>
- * ======================================================================================
- * Modification History:
- * ======================================================================================
- * <p>
- * Date:			11/17/2015
- * Original development
- *
- * @author lanhnguyen
- * @version 1.0
- *          Description:  	Output Segment Interfaces
- *          Design Pattern(s): No
- *          <p>
- *          ======================================================================================
- *          Copyright 2015, Sandlot Solutions. All rights reserved.
- *          ======================================================================================
- **/
 
 public class Client {
-    public static void main(String argv[]) throws Exception {
-        String sentence;
-        String modifiedSentence;
-        final File folder = new File("D:/input");
-        Socket clientSocket = new Socket("localhost", 6789);
-        for (File file : folder.listFiles()){
-            BufferedReader inFromUser = new BufferedReader(new FileReader(file));
-            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            while ((sentence = inFromUser.readLine()) != null) {
-                System.out.println(sentence);
-                outToServer.writeBytes(sentence + '\n');
-                //modifiedSentence = inFromServer.readLine();
-                //System.out.println("FROM SERVER: " + modifiedSentence);
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        String ip = "localhost";
+        int port = 6789;
+        String filePath = "D:\\LLPSender\\LLPSender\\hl7";
+        Socket socket = new Socket(ip, port);
+        System.out.println("Connect to server");
+
+        try {
+            final File folder = new File(filePath);
+            for (File file : folder.listFiles()) {
+                OutputStream out = socket.getOutputStream();
+                InputStream in = socket.getInputStream();
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    out.write((line + ConnectionHandler.END_CHAR).getBytes());
+                    readResponse(in);
+                }
+            }
+            socket.close();
+        } catch (SocketException e) {
+            throw new SocketException("Cannot connect to Listener");
+        }
+
+
+    }
+
+    private static void readResponse(InputStream in) throws IOException, InterruptedException {
+        StringBuilder response = new StringBuilder();
+        int attempts = 0;
+        while (in.available() == 0) {
+            attempts++;
+            Thread.sleep(10L);
+            if (attempts == 300) {
+                throw new SocketException();
             }
 
         }
 
+        int intch;
+        while ((intch = in.read()) != -1) {
+            response.append(Character.toString((char) intch));
+            if (intch == 3){
+                break;
+            }
 
-
-        clientSocket.close();
+        }
+        System.out.println(response);
     }
 }
