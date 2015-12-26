@@ -1,3 +1,5 @@
+package server.service;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,9 +10,13 @@ import java.util.regex.Pattern;
 public class ConnectionHandler extends AbstractConnectionHandler {
     public static final String END_CHAR = "\003";
     public static final String RESPONSE_MESSAGE = "Successfull";
+    private HDFSWriter hdfsWriter;
+    private String hdfsPath;
 
-    public ConnectionHandler(Socket aConnnection) {
+    public ConnectionHandler(Socket aConnnection, HDFSWriter hdfsWriter, String hdfsPath) {
         this.connnection = aConnnection;
+        this.hdfsWriter = hdfsWriter;
+        this.hdfsPath = hdfsPath;
     }
 
     @Override
@@ -21,19 +27,25 @@ public class ConnectionHandler extends AbstractConnectionHandler {
             InputStream in = connnection.getInputStream();
             OutputStream out = connnection.getOutputStream();
             Scanner scanner = new Scanner(in);
-            scanner.useDelimiter(Pattern.compile("\003"));
+            scanner.useDelimiter(Pattern.compile(END_CHAR));
             while (scanner.hasNext()){
-                write(scanner.next());
+                write(scanner.next() + "\n");
                 response(out, (RESPONSE_MESSAGE +END_CHAR).getBytes());
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                connnection.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
     @Override
     public void write(String line) {
-        System.out.println(line);
+        hdfsWriter.write(hdfsPath, line);
     }
 
     @Override

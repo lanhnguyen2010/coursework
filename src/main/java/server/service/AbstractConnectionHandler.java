@@ -1,3 +1,5 @@
+package server.service;
+
 import java.io.OutputStream;
 import java.net.Socket;
 

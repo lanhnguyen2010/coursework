@@ -1,3 +1,5 @@
+package client;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -6,12 +8,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import server.service.ConnectionHandler;
 
 
 public class Client {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        String ip = "localhost";
+        String ip = "192.168.56.101";
         int port = 6789;
         String filePath = "D:\\LLPSender\\LLPSender\\hl7";
         Socket socket = new Socket(ip, port);
