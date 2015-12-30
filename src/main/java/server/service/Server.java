@@ -9,12 +9,14 @@ public class Server{
     private String nameNode;
     private String hdfsUser;
     private String path;
+    private long fileSize;
 
-    public Server(int listenerPort, String nameNode, String hdfsUser, String path) {
+    public Server(int listenerPort, String nameNode, String hdfsUser, String path, long fileSize) {
         this.listenerPort = listenerPort;
         this.nameNode = nameNode;
         this.hdfsUser = hdfsUser;
         this.path = path;
+        this.fileSize = fileSize;
     }
 
 
@@ -24,7 +26,7 @@ public class Server{
             ServerSocket serverSocket = new ServerSocket(listenerPort, 1000);
             System.out.println("Server is started");
             Socket clientSocket = null;
-            hdfsWriter = new HDFSWriter(nameNode, hdfsUser, path);
+            hdfsWriter = new HDFSWriter(nameNode, hdfsUser, path, fileSize);
             while (true){
                 clientSocket = serverSocket.accept();
                 new Thread(new ConnectionHandler(clientSocket, hdfsWriter, path)).start();

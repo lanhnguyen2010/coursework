@@ -14,15 +14,20 @@ import server.service.ConnectionHandler;
 public class Client {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        String ip = "192.168.56.101";
-        int port = 6789;
-        String filePath = "D:\\LLPSender\\LLPSender\\hl7";
+        String ip = args[0];
+        int port = Integer.parseInt(args[1]);
+        String filePath = args[2];
         Socket socket = new Socket(ip, port);
         System.out.println("Connect to server");
 
         try {
             final File folder = new File(filePath);
             for (File file : folder.listFiles()) {
+
+                if (file.getName().endsWith("read")){
+                    continue;
+                }
+                System.out.println("Sending data in file :" + file.getName());
                 OutputStream out = socket.getOutputStream();
                 InputStream in = socket.getInputStream();
                 BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -31,10 +36,15 @@ public class Client {
                     out.write((line + ConnectionHandler.END_CHAR).getBytes());
                     readResponse(in);
                 }
+                reader.close();
+                file.renameTo(new File(file.getPath() + "_read"));
+                System.out.println("Finished sending file : "+ file.getName());
             }
             socket.close();
         } catch (SocketException e) {
             throw new SocketException("Cannot connect to Listener");
+        } finally {
+            socket.close();
         }
 
 
@@ -55,7 +65,7 @@ public class Client {
         int intch;
         while ((intch = in.read()) != -1) {
             response.append(Character.toString((char) intch));
-            if (intch == 3){
+            if (intch == 3) {
                 break;
             }
 

@@ -24,18 +24,23 @@ public class ConnectionHandler extends AbstractConnectionHandler {
         System.out.println("Receive message from " + connnection.getInetAddress().getHostAddress()
                 + " port: " + connnection.getPort());
         try {
+            int num =1;
             InputStream in = connnection.getInputStream();
             OutputStream out = connnection.getOutputStream();
             Scanner scanner = new Scanner(in);
             scanner.useDelimiter(Pattern.compile(END_CHAR));
             while (scanner.hasNext()){
                 write(scanner.next() + "\n");
-                response(out, (RESPONSE_MESSAGE +END_CHAR).getBytes());
+                response(out, (num +END_CHAR).getBytes());
+                num ++;
             }
+
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
+                hdfsWriter.close();
                 connnection.close();
             } catch (IOException ex) {
                 ex.printStackTrace();

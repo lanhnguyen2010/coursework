@@ -24,8 +24,9 @@ public class Cmd {
         String namenode = prop.getProperty("HDFS_NAMENODE");
         String hdfsUser = prop.getProperty("HDFS_USER");
         String path = prop.getProperty("HDFS_PATH");
+        long fileSize = Long.parseLong(prop.getProperty("FILE_SIZE"));
 
-        Server server = new Server(port, namenode, hdfsUser, path);
+        Server server = new Server(port, namenode, hdfsUser, path, fileSize);
         server.acceptConnection();
     }
 }

@@ -14,17 +14,23 @@ import server.error.ServerException;
  * Created by lanhnguyen on 12/23/2015.
  */
 public class HDFSWriter {
+    public static final String DONE_DIR = "/done";
+    public static final String TMP = ".tmp";
     private FileSystem fs;
     private BufferedWriter bw = null;
     private String filePath;
     private long size = 0L;
+    private long fileSize;
+    private long timeout = 0L;
+    private String fileName;
 
 
     public HDFSWriter(FileSystem fs) {
         this.fs = fs;
     }
 
-    public HDFSWriter(String namenode, String user, String path) {
+    public HDFSWriter(String namenode, String user, String path, long fileSize) {
+        this.fileSize = fileSize;
         try {
             Configuration conf = new Configuration();
             conf.set("fs.hdfs.impl",
@@ -38,10 +44,11 @@ public class HDFSWriter {
     }
 
     public void create(String path) throws ServerException {
-        filePath = path + "/" + "data_" + System.currentTimeMillis();
+        fileName = "/" + "data_" + System.currentTimeMillis() + TMP;
+        filePath = path;
         try {
-            System.out.println("Create file " + filePath);
-            bw = new BufferedWriter(new OutputStreamWriter(fs.create(new Path(filePath))));
+            System.out.println("Create file " + filePath + fileName);
+            bw = new BufferedWriter(new OutputStreamWriter(fs.create(new Path(filePath + fileName))));
         } catch (IOException e) {
             throw new ServerException("Cannot create file in path" + path);
         }
@@ -49,10 +56,11 @@ public class HDFSWriter {
     }
 
     public synchronized void write(String path, String msg) {
-        if (size >= 1000) {
+        if (size >= fileSize) {
             try {
-                System.out.println("Roll fize " + filePath);
+                System.out.println("Roll fize " + filePath + fileName);
                 bw.close();
+                rename();
                 bw = null;
                 size = 0;
             } catch (IOException e) {
@@ -74,8 +82,24 @@ public class HDFSWriter {
     public void close() {
         try {
             bw.close();
+            bw = null;
+            rename();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void rename() {
+        try {
+            String donePath = filePath + DONE_DIR;
+            if (!fs.exists(new Path(donePath))) {
+                fs.mkdirs(new Path(donePath));
+            }
+
+            System.out.println("move " + fileName + " to done dir");
+            fs.rename(new Path(filePath + fileName), new Path(donePath + fileName.replace(TMP, "")));
+        } catch (IOException e) {
+            throw new ServerException("Cannot rename file", e);
         }
     }
 
