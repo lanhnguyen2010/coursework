@@ -81,7 +81,9 @@ public class HDFSWriter {
 
     public void close() {
         try {
-            bw.close();
+            if (bw != null) {
+                bw.close();
+            }
             bw = null;
             rename();
         } catch (IOException e) {
