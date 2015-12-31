@@ -21,21 +21,22 @@ public class Server{
 
 
     public void acceptConnection() {
-        HDFSWriter hdfsWriter = null;
+        Socket clientSocket = null;
+
         try {
             ServerSocket serverSocket = new ServerSocket(listenerPort, 1000);
             System.out.println("Server is started");
-            Socket clientSocket = null;
-            hdfsWriter = new HDFSWriter(nameNode, hdfsUser, path, fileSize);
             while (true){
                 clientSocket = serverSocket.accept();
-                new Thread(new ConnectionHandler(clientSocket, hdfsWriter, path)).start();
+                new Thread(new ConnectionHandler(clientSocket, nameNode, hdfsUser, fileSize, path)).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (hdfsWriter != null) {
-                hdfsWriter.close();
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 

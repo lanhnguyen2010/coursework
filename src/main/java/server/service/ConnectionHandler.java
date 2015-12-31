@@ -13,9 +13,9 @@ public class ConnectionHandler extends AbstractConnectionHandler {
     private HDFSWriter hdfsWriter;
     private String hdfsPath;
 
-    public ConnectionHandler(Socket aConnnection, HDFSWriter hdfsWriter, String hdfsPath) {
+    public ConnectionHandler(Socket aConnnection,String nameNode, String hdfsUser, long fileSize, String hdfsPath) {
         this.connnection = aConnnection;
-        this.hdfsWriter = hdfsWriter;
+        this.hdfsWriter = new HDFSWriter(nameNode, hdfsUser, hdfsPath, fileSize);
         this.hdfsPath = hdfsPath;
     }
 
