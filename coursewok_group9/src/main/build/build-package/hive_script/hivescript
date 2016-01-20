@@ -1,0 +1,17 @@
+ADD JAR [path/to/coursework_group9/hive/hive-1.0-SNAPSHOT.jar];
+CREATE TEMPORARY FUNCTION getLocation as 'hive.CityGetter';
+
+CREATE EXTERNAL TABLE car (car_id String,time String,speed int, sensor_id int,direction String)
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY '\t'
+LOCATION '/user/server/data';
+
+select count(*) from car where sensor_id = 314 and
+unix_timestamp(time) >= unix_timestamp('2014-11-19 15:00:00')
+AND
+unix_timestamp(time) <= unix_timestamp('2014-11-19 18:00:00');
+
+select count(*) from car where sensor_id = 234 and
+hour(time) >= 15
+AND
+hour(time) <= 20;

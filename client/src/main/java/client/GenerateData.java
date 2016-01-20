@@ -1,9 +1,9 @@
 package client;
 
 import client.impl.ThreadSafeFileWriter;
+import client.service.DateUtils;
 import java.io.File;
 import java.util.Random;
-import server.service.DateUtils;
 
 /**
  * Created by lanhnguyen on 12/29/2015.

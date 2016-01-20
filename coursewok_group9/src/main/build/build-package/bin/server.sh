@@ -1,0 +1,1 @@
+java -cp ./lib/server-1.0-SNAPSHOT.jar server.cmd.Cmd ./server.properties

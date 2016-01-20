@@ -8,10 +8,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import server.service.ConnectionHandler;
 
 
 public class Client {
+    public static final String END_CHAR = "\003";
+
 
     public static void main(String[] args) throws IOException, InterruptedException {
         String ip = args[0];
@@ -33,7 +34,7 @@ public class Client {
                 BufferedReader reader = new BufferedReader(new FileReader(file));
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    out.write((line + ConnectionHandler.END_CHAR).getBytes());
+                    out.write((line + END_CHAR).getBytes());
                     readResponse(in);
                 }
                 reader.close();

@@ -1,0 +1,50 @@
+<assembly>
+    <!--<id>dist</id>-->
+    <formats>
+        <format>dir</format>
+        <format>tar</format>
+        <format>zip</format>
+    </formats>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <files>
+        <file>
+            <source>${basedir}/../client/target/client-${artifact.version}.jar
+            </source>
+            <outputDirectory>/lib</outputDirectory>
+        </file>
+        <file>
+            <source>${basedir}/../hive/target/hive-${artifact.version}.jar
+            </source>
+            <outputDirectory>/hive/</outputDirectory>
+        </file>
+
+        <file>
+            <source>${basedir}/../server/target/server-${artifact.version}.jar
+            </source>
+            <outputDirectory>/lib</outputDirectory>
+        </file>
+    </files>
+    
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}/src/main/build/build-package</directory>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>0744</fileMode>
+            <excludes>
+                <exclude>/bin/*</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/src/main/build/build-package/bin</directory>
+            <outputDirectory>/bin</outputDirectory>
+            <lineEnding>unix</lineEnding>
+            <fileMode>0744</fileMode>
+            <excludes>
+                <exclude>*.formatted</exclude>
+            </excludes>
+        </fileSet>
+
+    </fileSets>
+</assembly>

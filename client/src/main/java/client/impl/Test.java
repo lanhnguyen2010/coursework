@@ -1,7 +1,5 @@
 package client.impl;
 
-import java.math.BigDecimal;
-
 /**
  * Created by lanhnguyen on 12/31/2015.
  */
